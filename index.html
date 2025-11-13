@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Nepali अक्षर सिक्ने प्लेटफर्म</title>
+<style>
+body {
+    font-family: 'Mangal', sans-serif;
+    background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+h1 {
+    color: #ff3c78;
+    text-shadow: 2px 2px #fff;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.display {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    width: 90%;
+    max-width: 600px;
+    text-align: center;
+    font-size: 32px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    min-height: 60px;
+    margin-bottom: 15px;
+    transition: 0.2s;
+}
+.board {
+    display: grid;
+    grid-template-columns: repeat(6, 80px);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.key {
+    background: #ffe066;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: transform 0.2s, background 0.2s;
+    user-select: none;
+}
+.key:hover {
+    transform: scale(1.1);
+    background: #ff9a76;
+    color: #fff;
+}
+.special {
+    background-color: #ff6f91;
+    color: white;
+}
+.special:hover {
+    background-color: #ff3c78;
+}
+</style>
+</head>
+<body>
+
+<h1>🌟 Nepali अक्षर सिक्ने प्लेटफर्म 🌟</h1>
+
+<div class="display" id="display">क्लिक गरेर अक्षर बनाऔं</div>
+
+<div class="board" id="board"></div>
+
+<script>
+// क–ज्ञ सम्मका consonants
+const consonants = [
+'क','ख','ग','घ','ङ','च','छ','ज','झ','ञ','ट','ठ','ड','ढ','ण',
+'त','थ','द','ध','न','प','फ','ब','भ','म','य','र','ल','व','श',
+'ष','स','ह','क्ष','त्र','ज्ञ'
+];
+
+// vowels / matras
+const vowels = ['ा','ि','ी','ु','ू','े','ै','ो','ौ','ं'];
+
+// Special buttons
+const specials = ['+','Del','C'];
+
+// Create buttons dynamically
+const board = document.getElementById('board');
+consonants.forEach(c => {
+    const btn = document.createElement('div');
+    btn.className = 'key consonant';
+    btn.textContent = c;
+    board.appendChild(btn);
+});
+vowels.forEach(v => {
+    const btn = document.createElement('div');
+    btn.className = 'key vowel';
+    btn.textContent = v;
+    board.appendChild(btn);
+});
+specials.forEach(s => {
+    const btn = document.createElement('div');
+    btn.className = 'key special';
+    btn.textContent = s;
+    board.appendChild(btn);
+});
+
+const display = document.getElementById('display');
+let lastConsonant = "";
+
+// Function to play beep/fun sound
+function playSound() {
+    const context = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = context.createOscillator();
+    const gainNode = context.createGain();
+
+    oscillator.type = 'square'; // beep style
+    oscillator.frequency.setValueAtTime(Math.random() * 400 + 200, context.currentTime); // random pitch
+    oscillator.connect(gainNode);
+    gainNode.connect(context.destination);
+    gainNode.gain.setValueAtTime(0.2, context.currentTime);
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.15); // short beep
+}
+
+// Handle key clicks
+document.querySelectorAll('.key').forEach(key => {
+    key.addEventListener('click', () => {
+        const char = key.textContent;
+
+        playSound(); // beep on every click
+
+        if(char === 'Del') {
+            display.textContent = display.textContent.slice(0, -1);
+            lastConsonant = "";
+        } else if(char === 'C') {
+            display.textContent = '';
+            lastConsonant = "";
+        } else if(char === '+') {
+            // optional: highlight combination feature
+        } else if(key.classList.contains('consonant')) {
+            display.textContent += char;
+            lastConsonant = char;
+        } else if(key.classList.contains('vowel')) {
+            if(lastConsonant){
+                display.textContent = display.textContent.slice(0, -1) + lastConsonant + char;
+                lastConsonant = "";
+            } else {
+                display.textContent += char;
+            }
+        }
+    });
+});
+</script>
+
+</body>
+</html>
